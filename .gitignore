@@ -4,3 +4,4 @@
 */dist
 uv.lock
 cthreadingpi.egg-info
+*.pyd
