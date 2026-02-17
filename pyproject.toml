@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cthreadingpi"
-version = "0.1.1"
+version = "0.1.2"
 description = "High-performance C-backed threading replacement for Python 3.14t"
 readme = "README.md"
 requires-python = ">=3.14"
