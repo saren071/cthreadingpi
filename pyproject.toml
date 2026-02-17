@@ -4,14 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "cthreadingpi"
-version = "0.1.0"
+version = "0.1.1"
 description = "High-performance C-backed threading replacement for Python 3.14t"
 readme = "README.md"
 requires-python = ">=3.14"
-license = {text = "MIT"}
+license = {text = "Unlicense"}
 authors = [{name = "Sarenian", email = "ozlohu99@gmail.com"}]
 
 dependencies = []
+
+[project.urls]
+Repository = "https://github.com/saren071/cthreadingpi"
 
 [tool.setuptools.packages.find]
 where = ["src"]
