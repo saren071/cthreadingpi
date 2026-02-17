@@ -1,0 +1,172 @@
+[
+  {
+    "suite": "numpy",
+    "name": "matmul (Dense matrix multiply 1024x1024)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 60,
+      "elapsed": 0.44431559999793535,
+      "correct": true,
+      "final_value": "1.276345e+02",
+      "seq_elapsed": 3.319122700006119,
+      "ops_per_sec": 135.03914784958891,
+      "ns_per_op": 7405259.9999655895,
+      "speedup_vs_seq": 7.470191683617551,
+      "parallel_eff": 62.2515973634796,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 60,
+      "elapsed": 0.45162140000320505,
+      "correct": true,
+      "final_value": "1.276345e+02",
+      "seq_elapsed": 3.319122700006119,
+      "ops_per_sec": 132.85464329098266,
+      "ns_per_op": 7527023.333386751,
+      "speedup_vs_seq": 7.349347705805269,
+      "parallel_eff": 61.24456421504391,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "numpy",
+    "name": "svd (Full SVD decomposition 512x512)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 60,
+      "elapsed": 0.5717852000016137,
+      "correct": true,
+      "final_value": "4.915576e+04",
+      "seq_elapsed": 4.0118804999947315,
+      "ops_per_sec": 104.93451037178063,
+      "ns_per_op": 9529753.333360229,
+      "speedup_vs_seq": 7.0164119322840275,
+      "parallel_eff": 58.47009943570023,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 60,
+      "elapsed": 0.5647966000033193,
+      "correct": true,
+      "final_value": "4.915576e+04",
+      "seq_elapsed": 4.0118804999947315,
+      "ops_per_sec": 106.23293412114623,
+      "ns_per_op": 9413276.66672199,
+      "speedup_vs_seq": 7.103230614297525,
+      "parallel_eff": 59.193588452479375,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "numpy",
+    "name": "fft (2-D FFT 2048x2048)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 60,
+      "elapsed": 2.281368299998576,
+      "correct": true,
+      "final_value": "9.075276e+03",
+      "seq_elapsed": 12.707010099999025,
+      "ops_per_sec": 26.30000600956779,
+      "ns_per_op": 38022804.99997626,
+      "speedup_vs_seq": 5.569907366560216,
+      "parallel_eff": 46.415894721335135,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 60,
+      "elapsed": 2.17576310000004,
+      "correct": true,
+      "final_value": "9.075276e+03",
+      "seq_elapsed": 12.707010099999025,
+      "ops_per_sec": 27.576531654571628,
+      "ns_per_op": 36262718.333334,
+      "speedup_vs_seq": 5.840254437626408,
+      "parallel_eff": 48.66878698022006,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "numpy",
+    "name": "eig (Symmetric eigendecomp 768x768)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 60,
+      "elapsed": 0.7575834000017494,
+      "correct": true,
+      "final_value": "6.392762e+04",
+      "seq_elapsed": 4.8640228000003844,
+      "ops_per_sec": 79.19920103827704,
+      "ns_per_op": 12626390.000029156,
+      "speedup_vs_seq": 6.420445326533227,
+      "parallel_eff": 53.503711054443556,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 60,
+      "elapsed": 0.7477916999996523,
+      "correct": true,
+      "final_value": "6.392762e+04",
+      "seq_elapsed": 4.8640228000003844,
+      "ops_per_sec": 80.2362476074927,
+      "ns_per_op": 12463194.999994207,
+      "speedup_vs_seq": 6.504515629155346,
+      "parallel_eff": 54.20429690962788,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "numpy",
+    "name": "cholesky (Cholesky + tri-solve 1024x1024)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 60,
+      "elapsed": 0.9422972000029404,
+      "correct": true,
+      "final_value": "2.667323e+00",
+      "seq_elapsed": 6.197268100004294,
+      "ops_per_sec": 63.67417838004058,
+      "ns_per_op": 15704953.33338234,
+      "speedup_vs_seq": 6.576765907810143,
+      "parallel_eff": 54.80638256508452,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 60,
+      "elapsed": 0.9271492999978364,
+      "correct": true,
+      "final_value": "2.667323e+00",
+      "seq_elapsed": 6.197268100004294,
+      "ops_per_sec": 64.71449636012238,
+      "ns_per_op": 15452488.333297273,
+      "speedup_vs_seq": 6.684218065007174,
+      "parallel_eff": 55.70181720839312,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  }
+]

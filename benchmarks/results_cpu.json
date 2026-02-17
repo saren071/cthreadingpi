@@ -1,0 +1,172 @@
+[
+  {
+    "suite": "cpu",
+    "name": "montecarlo (Monte Carlo Pi (5,000,000 samples/worker))",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 12,
+      "elapsed": 1.7218722000034177,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 9.23084490000474,
+      "ops_per_sec": 6.9691583382182385,
+      "ns_per_op": 143489350.00028482,
+      "speedup_vs_seq": 5.360934975305611,
+      "parallel_eff": 44.67445812754676,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 12,
+      "elapsed": 1.6242666999969515,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 9.23084490000474,
+      "ops_per_sec": 7.38794928198831,
+      "ns_per_op": 135355558.3330793,
+      "speedup_vs_seq": 5.6830844959279565,
+      "parallel_eff": 47.359037466066304,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "cpu",
+    "name": "mandelbrot (Mandelbrot 1400x1400 (120 bands))",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 120,
+      "elapsed": 0.6651863000006415,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 3.8952871000001323,
+      "ops_per_sec": 180.40058852667934,
+      "ns_per_op": 5543219.166672012,
+      "speedup_vs_seq": 5.855934044336715,
+      "parallel_eff": 48.79945036947262,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 120,
+      "elapsed": 0.6667739999975311,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 3.8952871000001323,
+      "ops_per_sec": 179.97102466569532,
+      "ns_per_op": 5556449.999979425,
+      "speedup_vs_seq": 5.841990089617405,
+      "parallel_eff": 48.68325074681171,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "cpu",
+    "name": "primes (Prime sieve to 1,500,000 (120 chunks))",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 120,
+      "elapsed": 0.7661574000012479,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 4.780314200004796,
+      "ops_per_sec": 156.62577950667128,
+      "ns_per_op": 6384645.000010399,
+      "speedup_vs_seq": 6.239336982188007,
+      "parallel_eff": 51.99447485156673,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 120,
+      "elapsed": 0.7680835999999545,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 4.780314200004796,
+      "ops_per_sec": 156.2329933877082,
+      "ns_per_op": 6400696.666666287,
+      "speedup_vs_seq": 6.223689973337641,
+      "parallel_eff": 51.86408311114701,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "cpu",
+    "name": "nbody (N-body 512 particles x 40 steps)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 12,
+      "elapsed": 6.087674000002153,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 38.793227899994235,
+      "ops_per_sec": 1.9711962237129905,
+      "ns_per_op": 507306166.66684604,
+      "speedup_vs_seq": 6.372422028508839,
+      "parallel_eff": 53.10351690424032,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 12,
+      "elapsed": 6.297941899996658,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 38.793227899994235,
+      "ops_per_sec": 1.9053843605648961,
+      "ns_per_op": 524828491.6663882,
+      "speedup_vs_seq": 6.159667478039901,
+      "parallel_eff": 51.33056231699917,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "cpu",
+    "name": "json (JSON round-trip 300 docs x 500 keys)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 12,
+      "elapsed": 3.1210080000018934,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 20.517323699998087,
+      "ops_per_sec": 3.84491164392809,
+      "ns_per_op": 260084000.0001578,
+      "speedup_vs_seq": 6.573941399697034,
+      "parallel_eff": 54.78284499747529,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 12,
+      "elapsed": 3.0659745000011753,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 20.517323699998087,
+      "ops_per_sec": 3.9139268770811366,
+      "ns_per_op": 255497875.00009796,
+      "speedup_vs_seq": 6.691942056266359,
+      "parallel_eff": 55.76618380221966,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  }
+]

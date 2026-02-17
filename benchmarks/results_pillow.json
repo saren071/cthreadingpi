@@ -1,0 +1,172 @@
+[
+  {
+    "suite": "pillow",
+    "name": "blur (Gaussian blur 2048x2048, 12 passes x 2 imgs)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 12,
+      "elapsed": 3.22288860000117,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 23.920639199997822,
+      "ops_per_sec": 3.72336791287035,
+      "ns_per_op": 268574050.00009745,
+      "speedup_vs_seq": 7.422111704385047,
+      "parallel_eff": 61.8509308698754,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 12,
+      "elapsed": 3.283682499997667,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 23.920639199997822,
+      "ops_per_sec": 3.6544337036265,
+      "ns_per_op": 273640208.3331389,
+      "speedup_vs_seq": 7.284699175396774,
+      "parallel_eff": 60.70582646163979,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "pillow",
+    "name": "resize (Lanczos resize cascade 2048x2048, 8 trips x 2 imgs)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 12,
+      "elapsed": 1.7868205000049784,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 13.444468300003791,
+      "ops_per_sec": 6.7158396716215005,
+      "ns_per_op": 148901708.3337482,
+      "speedup_vs_seq": 7.524241131085262,
+      "parallel_eff": 62.702009425710514,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 12,
+      "elapsed": 1.8074487000048975,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 13.444468300003791,
+      "ops_per_sec": 6.639192581215436,
+      "ns_per_op": 150620725.00040814,
+      "speedup_vs_seq": 7.438367849647606,
+      "parallel_eff": 61.98639874706339,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "pillow",
+    "name": "edge (Edge+Sharpen+Emboss 2048x2048, 10 passes x 2 imgs)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 12,
+      "elapsed": 7.659659800003283,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 71.6891758999991,
+      "ops_per_sec": 1.5666492133233982,
+      "ns_per_op": 638304983.3336068,
+      "speedup_vs_seq": 9.359315918961359,
+      "parallel_eff": 77.994299324678,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 12,
+      "elapsed": 7.677635400003055,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 71.6891758999991,
+      "ops_per_sec": 1.5629812272663046,
+      "ns_per_op": 639802950.0002546,
+      "speedup_vs_seq": 9.337403010824215,
+      "parallel_eff": 77.81169175686846,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "pillow",
+    "name": "color (Color-space round-trip 2048x2048, 6 trips x 2 imgs)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 12,
+      "elapsed": 4.1021412999980384,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 37.323083499999484,
+      "ops_per_sec": 2.925301476086584,
+      "ns_per_op": 341845108.3331699,
+      "speedup_vs_seq": 9.098439271220943,
+      "parallel_eff": 75.82032726017452,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 12,
+      "elapsed": 4.078776700000162,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 37.323083499999484,
+      "ops_per_sec": 2.9420585833981847,
+      "ns_per_op": 339898058.33334684,
+      "speedup_vs_seq": 9.150558180838386,
+      "parallel_eff": 76.25465150698655,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  },
+  {
+    "suite": "pillow",
+    "name": "composite (Alpha composite 8 layers 2048x2048 x 2 imgs)",
+    "stdlib": {
+      "label": "stdlib",
+      "ops": 12,
+      "elapsed": 2.1653846000044723,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 13.628132399993774,
+      "ops_per_sec": 5.541740714317085,
+      "ns_per_op": 180448716.66703936,
+      "speedup_vs_seq": 6.293631348429109,
+      "parallel_eff": 52.44692790357591,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    },
+    "cthreading": {
+      "label": "cthreading",
+      "ops": 12,
+      "elapsed": 2.0060024999984307,
+      "correct": true,
+      "final_value": null,
+      "seq_elapsed": 13.628132399993774,
+      "ops_per_sec": 5.982046383296824,
+      "ns_per_op": 167166874.99986923,
+      "speedup_vs_seq": 6.793676677872752,
+      "parallel_eff": 56.61397231560626,
+      "extra": {
+        "checksums_match": "YES"
+      }
+    }
+  }
+]

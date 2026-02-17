@@ -1,0 +1,295 @@
+[
+  {
+    "suite": "simulated",
+    "name": "Lock contention (12T x 200,000)",
+    "stdlib": {
+      "label": "stdlib lock+int",
+      "ops": 2400000,
+      "elapsed": 8.138007900000957,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 294912.46868901636,
+      "ns_per_op": 3390.836625000399,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {}
+    },
+    "cthreading": {
+      "label": "C Ghost.add",
+      "ops": 2400000,
+      "elapsed": 0.2906155000018771,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 8258334.4659335045,
+      "ns_per_op": 121.08979166744878,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {}
+    }
+  },
+  {
+    "suite": "simulated",
+    "name": "Counter: Ghost (12T x 200,000)",
+    "stdlib": {
+      "label": "stdlib lock+int",
+      "ops": 2400000,
+      "elapsed": 8.381777900001907,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 286335.4324861619,
+      "ns_per_op": 3492.407458334128,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {}
+    },
+    "cthreading": {
+      "label": "C Ghost.add",
+      "ops": 2400000,
+      "elapsed": 0.32107900000119116,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 7474795.922471094,
+      "ns_per_op": 133.78291666716297,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {}
+    }
+  },
+  {
+    "suite": "simulated",
+    "name": "Counter: sharded (12T x 200,000)",
+    "stdlib": {
+      "label": "stdlib lock+int",
+      "ops": 2400000,
+      "elapsed": 8.381777900001907,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 286335.4324861619,
+      "ns_per_op": 3492.407458334128,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {}
+    },
+    "cthreading": {
+      "label": "C Counter(64)",
+      "ops": 2400000,
+      "elapsed": 0.27092160000029253,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 8858651.358907552,
+      "ns_per_op": 112.88400000012189,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {}
+    }
+  },
+  {
+    "suite": "simulated",
+    "name": "Queue throughput (6P x 50,000, 6C)",
+    "stdlib": {
+      "label": "stdlib Queue",
+      "ops": 300000,
+      "elapsed": 3.431210299997474,
+      "correct": true,
+      "final_value": 300000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 87432.70559668723,
+      "ns_per_op": 11437.367666658247,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "queue_empty": "True"
+      }
+    },
+    "cthreading": {
+      "label": "C Queue",
+      "ops": 300000,
+      "elapsed": 0.21925679999549175,
+      "correct": true,
+      "final_value": 300000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 1368258.589955561,
+      "ns_per_op": 730.8559999849725,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "queue_empty": "True"
+      }
+    }
+  },
+  {
+    "suite": "simulated",
+    "name": "Pool dispatch (100,000 tasks, 12W)",
+    "stdlib": {
+      "label": "ThreadPoolExecutor",
+      "ops": 100000,
+      "elapsed": 1.82547849999537,
+      "correct": true,
+      "final_value": 100000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 54780.15764099859,
+      "ns_per_op": 18254.7849999537,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "workers": "12"
+      }
+    },
+    "cthreading": {
+      "label": "C ThreadPool",
+      "ops": 100000,
+      "elapsed": 0.253776999998081,
+      "correct": true,
+      "final_value": 100000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 394046.7418274949,
+      "ns_per_op": 2537.76999998081,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "workers": "12"
+      }
+    }
+  },
+  {
+    "suite": "simulated",
+    "name": "Event.wait (12T x 200,000)",
+    "stdlib": {
+      "label": "stdlib Event.wait",
+      "ops": 2400000,
+      "elapsed": 10.675263999997696,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 224818.7960504319,
+      "ns_per_op": 4448.026666665706,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {}
+    },
+    "cthreading": {
+      "label": "C Event.wait",
+      "ops": 2400000,
+      "elapsed": 0.017888999995193444,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 134160657.42326853,
+      "ns_per_op": 7.453749997997268,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {}
+    }
+  },
+  {
+    "suite": "simulated",
+    "name": "Semaphore acq/rel (12T x 200,000, 24p)",
+    "stdlib": {
+      "label": "stdlib Semaphore",
+      "ops": 2400000,
+      "elapsed": 24.622140500003297,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 97473.24770564437,
+      "ns_per_op": 10259.225208334707,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "permits": "24"
+      }
+    },
+    "cthreading": {
+      "label": "C Semaphore",
+      "ops": 2400000,
+      "elapsed": 0.3004830999998376,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 7987138.045371927,
+      "ns_per_op": 125.20129166659899,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "permits": "24"
+      }
+    }
+  },
+  {
+    "suite": "simulated",
+    "name": "Integrated stress (12T x 100,000)",
+    "stdlib": {
+      "label": "stdlib lock+dict",
+      "ops": 1200000,
+      "elapsed": 0.3001880000010715,
+      "correct": true,
+      "final_value": 1200000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 3997494.90317973,
+      "ns_per_op": 250.1566666675596,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "flush_every": "25"
+      }
+    },
+    "cthreading": {
+      "label": "OmniBase Ghost",
+      "ops": 1200000,
+      "elapsed": 0.01804730000003474,
+      "correct": true,
+      "final_value": 1200000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 66491940.62256904,
+      "ns_per_op": 15.039416666695615,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "flush_every": "25",
+        "accesses": "48000",
+        "contention": "0",
+        "version": "48000"
+      }
+    }
+  },
+  {
+    "suite": "simulated",
+    "name": "Race correctness (12T x 200,000)",
+    "stdlib": {
+      "label": "bare int (UNSAFE)",
+      "ops": 2400000,
+      "elapsed": 1.5382033999994746,
+      "correct": false,
+      "final_value": 561972,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 1560261.7963273386,
+      "ns_per_op": 640.9180833331144,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "race_losses": "1,838,028"
+      }
+    },
+    "cthreading": {
+      "label": "C Ghost (SAFE)",
+      "ops": 2400000,
+      "elapsed": 0.3337699999974575,
+      "correct": true,
+      "final_value": 2400000,
+      "seq_elapsed": 0.0,
+      "ops_per_sec": 7190580.339809695,
+      "ns_per_op": 139.07083333227396,
+      "speedup_vs_seq": 0.0,
+      "parallel_eff": 0.0,
+      "extra": {
+        "race_losses": "0"
+      }
+    }
+  }
+]
