@@ -1,0 +1,6 @@
+include src/cthreading/monitoring.c
+include src/cthreading/sync.c
+include src/cthreading/queue.c
+include src/cthreading/threading.c
+include src/cthreading/tasks.c
+global-include *.h

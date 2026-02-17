@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cthreadingpi"
+version = "0.1.0"
+description = "High-performance C-backed threading replacement for Python 3.14t"
+readme = "README.md"
+requires-python = ">=3.14"
+license = {text = "MIT"}
+authors = [{name = "Sarenian", email = "ozlohu99@gmail.com"}]
+
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+cthreading = ["*.pyi", "*.pyd", "py.typed"]

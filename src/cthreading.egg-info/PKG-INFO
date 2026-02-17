@@ -1,0 +1,98 @@
+Metadata-Version: 2.4
+Name: cthreading
+Version: 0.1.0
+Summary: High-performance C-backed threading replacement for Python 3.14t
+Author-email: Sarenian <ozlohu99@gmail.com>
+License: MIT
+Requires-Python: >=3.14
+Description-Content-Type: text/markdown
+
+# cthreading
+
+High-performance C-backed threading replacement for Python 3.14t.
+
+All queuing, threading, batching, and contention-handling runs in C.
+Python is just the glue.
+
+## Installation
+
+```bash
+pip install cthreading
+```
+
+## Quick Start
+
+```python
+from cthreading import auto_thread, ThreadPool, Lock, Queue
+from cthreading.monitoring import Ghost, Counter
+
+# Fire-and-forget threading via decorator
+counter = Ghost(initial=0)
+
+@auto_thread
+def work(i):
+    counter.add(1)
+
+for i in range(100_000):
+    work(i)
+
+# Or use a pool directly
+pool = ThreadPool(num_workers=8)
+pool.submit(print, ("hello from pool",))
+pool.shutdown()
+```
+
+## Architecture
+
+### C Core Modules
+
+- **`_monitoring`** — Ghost cells (locked any-type), sharded Counter (int64), telemetry toggle
+- **`_sync`** — Lock, RLock, Event, Semaphore, Condition (all with contention stats)
+- **`_queue`** — Thread-safe Queue (FIFO) and PriorityQueue (min-heap)
+- **`_threading`** — ThreadPool (C worker threads), auto_thread decorator, cpu_count
+- **`_tasks`** — TaskBatch (batched flush), TaskGroup (grouped tracking)
+
+### Python Thin Wrappers
+
+Each C module has a Python wrapper that:
+
+1. Imports the C symbols
+2. Falls back to pure-Python if the C extension isn't available
+3. Provides simple object construction and type stubs
+
+```python
+from cthreading import ThreadPool, Lock, Queue, auto_thread
+from cthreading.monitoring import Ghost, Counter
+from cthreading.sync import Semaphore, Event, Condition, RLock
+from cthreading.queue import PriorityQueue
+from cthreading.tasks import TaskBatch, TaskGroup
+```
+
+## Building
+
+```bash
+pip install build
+python -m build
+```
+
+The `.whl` in `dist/` contains compiled C extensions. Install with:
+
+```bash
+pip install cthreading-0.1.0-....whl
+```
+
+## Development
+
+```bash
+uv pip install -e .
+uv run --python 3.14t examples/basic_app.py
+```
+
+## Features
+
+- **Max performance** — everything runs in C with minimal Python overhead
+- **Auto-threading** — `@auto_thread` decorator dispatches to a C thread pool
+- **Contention telemetry** — Ghost cells and all sync primitives track access/contention stats
+- **Full threading replacement** — Lock, RLock, Event, Semaphore, Condition, Queue, PriorityQueue
+- **Task batching** — TaskBatch accumulates and flushes to pool in bulk
+- **Free-threading ready** — designed for Python 3.14t (no-GIL)
