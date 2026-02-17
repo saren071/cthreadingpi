@@ -4,7 +4,7 @@ High-performance C-backed threading replacement for Python 3.14t
 
 **Version:** 0.1.0  
 **Author:** Sarenian <ozlohu99@gmail.com>  
-**License:** MIT  
+**License:** unlicense  
 **Python Version:** >=3.14
 
 ## Installation
