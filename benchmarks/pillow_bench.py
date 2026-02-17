@@ -31,15 +31,23 @@ import struct
 import sys
 import threading
 import time
-from typing import Callable
-
-from PIL import Image, ImageFilter
+from typing import TYPE_CHECKING
 
 from bench_format import (
-    WORKERS, Metrics,
-    print_header, section, record, print_suite_summary, export_json,
+    WORKERS,
+    Metrics,
+    export_json,
+    print_header,
+    print_suite_summary,
+    record,
+    section,
 )
+from PIL import Image, ImageFilter
+
 from cthreading import parallel_starmap
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # ===================================================================
 # CONFIG
@@ -216,7 +224,7 @@ def bench_pmap(
 ) -> tuple[float, list[float]]:
     def coarse_worker(tid: int, n_items: int, n_workers: int) -> list[tuple[int, float]]:
         """Each task handles its share of chunks — same granularity as stdlib."""
-        results = []
+        results: list[tuple[int, float]] = []
         for i in range(tid, n_items, n_workers):
             cs = workload_fn(BASE_SEED, i)
             results.append((i, cs))

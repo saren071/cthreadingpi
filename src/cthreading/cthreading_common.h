@@ -225,10 +225,13 @@ cthreading_physical_cpu_count(void)
  * Task node — used by both threading.c and tasks.c
  * ---------------------------------------------------------------- */
 
+struct FutureObject;
+
 typedef struct TaskNode {
     PyObject       *callable;
     PyObject       *args;
     PyObject       *kwargs;
+    struct FutureObject *future;   /* NULL = fire-and-forget */
     int             priority;
     int64_t         group_id;
     struct TaskNode *next;

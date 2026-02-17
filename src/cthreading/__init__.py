@@ -6,6 +6,7 @@ Usage:
     from cthreading.monitoring import Ghost, Counter
 """
 
+from cthreading._threading import auto_run_parallel
 from cthreading.auto import auto_threaded
 from cthreading.monitoring import Counter, Ghost
 from cthreading.pool import (
@@ -47,6 +48,7 @@ __all__ = [
     "Timer",
     "ThreadPool",
     "auto_thread",
+    "auto_run_parallel",
     "cpu_count",
     "physical_cpu_count",
     "parallel_map",

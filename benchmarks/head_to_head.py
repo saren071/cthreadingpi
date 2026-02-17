@@ -22,16 +22,27 @@ import queue as stdlib_queue
 import sys
 import threading as stdlib_threading
 import time
-from typing import Callable
+from typing import TYPE_CHECKING
 
-from bench_format import (  # noqa: E402
-    WORKERS, Metrics,
-    print_header as _bf_header, section, record, print_suite_summary, export_json,
+from bench_format import (
+    WORKERS,
+    Metrics,
+    export_json,
+    print_suite_summary,
+    record,
+    section,
 )
+from bench_format import (
+    print_header as _bf_header,
+)
+
 from cthreading.auto import auto_threaded
 from cthreading.monitoring import Counter as CCounter
 from cthreading.monitoring import Ghost as CGhost
 from cthreading.monitoring import set_enabled as set_monitoring_enabled
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # ═══════════════════════════════════════════════════════════════════
 # CONFIGURATION
@@ -86,7 +97,7 @@ _CSimpleQueue       = stdlib_queue.SimpleQueue
 
 BENCH_TIMEOUT = 30.0  # seconds — abort if stdlib hangs under free-threaded contention
 
-def _run_threaded(fn: Callable, n: int) -> float:
+def _run_threaded(fn: Callable[..., None], n: int) -> float:
     """Spawn *n* stdlib threads (always real OS threads) running *fn*.
     Aborts after BENCH_TIMEOUT seconds to avoid deadlocks on free-threaded builds."""
     threads = [stdlib_threading.Thread(target=fn, daemon=True) for _ in range(n)]
@@ -102,7 +113,7 @@ def _run_threaded(fn: Callable, n: int) -> float:
     return elapsed
 
 
-def _collect_latencies(op: Callable, count: int) -> list[float]:
+def _collect_latencies(op: Callable[..., None], count: int) -> list[float]:
     lats: list[float] = []
     for _ in range(count):
         t0 = time.perf_counter_ns()
@@ -532,8 +543,8 @@ def bench_queue():
     total = WORKERS * iters
 
     # Multi-thread put
-    py_q = _StdQueue()
-    ct_q = _CQueue()
+    py_q: stdlib_queue.Queue[int] = _StdQueue()
+    ct_q: stdlib_queue.Queue[int] = _CQueue()
 
     def py_put():
         q = py_q
@@ -555,9 +566,9 @@ def bench_queue():
     n_prod = max(WORKERS // 2, 2)
     n_cons = max(WORKERS // 2, 2)
     total_items = n_prod * items_per
-    sentinel = None
+    sentinel: int | None = None
 
-    py_q2 = _StdQueue()
+    py_q2: stdlib_queue.Queue[int] = _StdQueue()
     py_consumed = [0]
     py_lock = _StdLock()
     def py_producer():
@@ -566,7 +577,7 @@ def bench_queue():
     def py_consumer():
         while True:
             item = py_q2.get()
-            if item is sentinel:
+            if sentinel is not None and item is sentinel:
                 break
             with py_lock:
                 py_consumed[0] += 1
@@ -586,7 +597,7 @@ def bench_queue():
         t.join()
     py_e2 = time.perf_counter() - t0
 
-    ct_q2 = _CQueue()
+    ct_q2: stdlib_queue.Queue[int] = _CQueue()
     ct_consumed = [0]
     ct_lock = _CLock()
     def ct_producer():
@@ -595,7 +606,7 @@ def bench_queue():
     def ct_consumer():
         while True:
             item = ct_q2.get()
-            if item is sentinel:
+            if sentinel is not None and item is sentinel:
                 break
             with ct_lock:
                 ct_consumed[0] += 1
@@ -624,8 +635,8 @@ def bench_queue():
     # SimpleQueue — multi-thread put
     iters_sq = ITERS_MT
     total_sq = WORKERS * iters_sq
-    py_sq = _StdSimpleQueue()
-    ct_sq = _CSimpleQueue()
+    py_sq: stdlib_queue.SimpleQueue[int] = _StdSimpleQueue()
+    ct_sq: stdlib_queue.SimpleQueue[int] = _CSimpleQueue()
 
     def py_sq_put():
         q = py_sq

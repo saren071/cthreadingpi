@@ -26,13 +26,13 @@ MIN_SPEEDUP = 15.0  # gate: cthreading must be >= this vs stdlib
 
 try:
     from cthreading import physical_cpu_count
-    PHYSICAL = physical_cpu_count()
+    physical = physical_cpu_count()
 except Exception:
-    PHYSICAL = max((os.cpu_count() or 4) // 2, 1)
+    physical = max((os.cpu_count() or 4) // 2, 1)
 
 CPUS = os.cpu_count() or 4
-WORKERS = PHYSICAL
-FREE_THREADED = hasattr(sys, "_is_gil_enabled") and not sys._is_gil_enabled()
+WORKERS = physical
+FREE_THREADED = hasattr(sys, "is_gil_enabled") and not sys.is_gil_enabled()
 
 BAR = "\u2501" * 100          # ━
 THIN = "\u2500" * 84          # ─
@@ -169,7 +169,7 @@ def print_header(
     print(f"  Python       : {sys.version.split()[0]}  "
           f"({'free-threaded' if FREE_THREADED else 'GIL-enabled'})")
     print(f"  Platform     : {platform.platform()}")
-    print(f"  CPU (logical): {CPUS}   Physical: {PHYSICAL}   Workers: {WORKERS}")
+    print(f"  CPU (logical): {CPUS}   Physical: {physical}   Workers: {WORKERS}")
     print(f"  Gate target  : \u2265 {MIN_SPEEDUP:.0f}x  (cthreading vs stdlib)")
     c_exts: list[str] = []
     for mod in ("_sync", "_threading", "_queue", "_monitoring", "_tasks"):
@@ -488,7 +488,7 @@ def _print_summary_table(
 # ═══════════════════════════════════════════════════════════════════
 
 def export_json(filepath: str) -> None:
-    data = []
+    data: list[dict[str, Any]] = []
     for suite, name, std, ct in ALL_RESULTS:
         data.append({
             "suite": suite,

@@ -1,53 +1,83 @@
 """
-cthreading.auto — Automatic Parallelism & Native Primitives.
+cthreading.auto
+~~~~~~~~~~~~~~~
 
-This module consolidates two major features:
-1. **AST-Rewriting (The "New" Auto):** Automatically parallelizes comprehensions,
-   for-loops, and sequential function calls by rewriting Python bytecode at runtime.
-2. **Native Monkey-Patching (The "Old" Auto):** Replaces standard library
-   ``threading`` and ``queue`` primitives with cthreading's C-backed implementations
-   (Lock, Event, Queue, etc.) for OS-native synchronization.
+AST-rewriting auto-parallelizer.
+
+Decorate any entry-point function with ``@auto_threaded`` and the
+transformer rewrites it — and every pure-Python function it transitively
+calls in the same module — before Python executes a single bytecode.
+
+Transformations applied
+-----------------------
+1. List/set comprehensions        →  pool.map / pool.starmap
+       [f(x) for x in items]      →  list(pool.map(f, items))
+       [f(a,b) for a,b in items]  →  list(pool.starmap(f, items))
+
+2. for-range loops (subscript assignment)
+       for i in range(n): out[i] = f(i)
+   →   out[:] = pool.map(f, range(n))
+
+3. for-range accumulator / reduction
+       for i in range(n): total += f(i)
+   →   total += sum(pool.map(f, range(n)))
+
+4. Independent sequential calls in the same scope
+       a = fetch_a()      # g does not read a
+       b = fetch_b()
+       use(a, b)
+   →   __ct_fut_1 = pool.submit(fetch_a)
+       __ct_fut_2 = pool.submit(fetch_b)
+       a, b = __ct_fut_1.result(), __ct_fut_2.result()
+       use(a, b)
+
+5. Transitive rewriting — every pure-Python callable defined in the same
+   module file is also rewritten recursively (up to depth 8).
+
+Hard limits (physics, not engineering)
+---------------------------------------
+* A single opaque call  f(big_n)  cannot be split — the loop inside f
+  is invisible until f's source is rewritten, which IS done when f lives
+  in the same module.  Third-party C extensions are never rewritten.
+* Shared mutable state (appending to the same list from N threads) is
+  the caller's responsibility.
+* Recursive functions, generators (yield), and async def are left alone.
 
 Usage
 -----
     from cthreading import auto_threaded
 
-    # 1. AST Rewriting (Auto-Parallelism)
-    @auto_threaded
+    @auto_threaded          # one decorator on the entry point
     def main():
-        results = [heavy(x) for x in big_list]   # → automatically runs in pool
-        process(results)
+        results = [heavy(x) for x in big_list]   # → pool.map
+        a = fetch_a()                             # → concurrent
+        b = fetch_b()                             # → concurrent
+        process(a, b)                             # sequential (b depends on a,b)
 
-    # 2. Global Patching (C-backed Primitives)
-    auto_threaded.patch()  # Replaces threading.Lock, queue.Queue, threading.Thread, etc.
-    # ... application code ...
-    auto_threaded.unpatch()
+    main()
+
+    # Or wrap without modifying the original source:
+    auto_threaded.run(my_main)
 """
 
 from __future__ import annotations
 
 import ast
 import functools
-import importlib
 import inspect
-import queue
 import textwrap
 import threading
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 from typing import Any, TypeVar
-
-# ---------------------------------------------------------------------------
-# Types and Globals
-# ---------------------------------------------------------------------------
 
 F = TypeVar("F", bound=Callable[..., Any])
 
-_patched: bool = False
-_originals: dict[str, Any] = {}
-
+# ---------------------------------------------------------------------------
 # Pool access (lazy, thread-safe)
+# ---------------------------------------------------------------------------
 _pool_singleton: Any = None
 _pool_lock = threading.Lock()
+
 
 def _get_pool() -> Any:
     global _pool_singleton
@@ -58,94 +88,20 @@ def _get_pool() -> Any:
                 _pool_singleton = get_default_pool()
     return _pool_singleton
 
-# ---------------------------------------------------------------------------
-# 1. Native Primitives Patching (From Old auto.py)
-# ---------------------------------------------------------------------------
-
-def _patch_primitives() -> None:
-    """Replace stdlib threading/queue classes with cthreading equivalents."""
-    from cthreading.queue import (
-        LifoQueue as CLifoQueue,
-    )
-    from cthreading.queue import (
-        Queue as CQueue,
-    )
-    from cthreading.queue import (
-        SimpleQueue as CSimpleQueue,
-    )
-    from cthreading.sync import (
-        Barrier,
-        BoundedSemaphore,
-        Condition,
-        Event,
-        Lock,
-        RLock,
-        Semaphore,
-    )
-
-    # Save originals
-    if not _originals:
-        _originals.update({
-            "threading.Lock": threading.Lock,
-            "threading.RLock": threading.RLock,
-            "threading.Event": threading.Event,
-            "threading.Semaphore": threading.Semaphore,
-            "threading.BoundedSemaphore": threading.BoundedSemaphore,
-            "threading.Condition": threading.Condition,
-            "threading.Barrier": threading.Barrier,
-            "queue.Queue": queue.Queue,
-            "queue.LifoQueue": queue.LifoQueue,
-            "queue.SimpleQueue": queue.SimpleQueue,
-            # Thread is handled separately in the class, but we track it here implies logic separation
-        })
-
-    # Patch threading module
-    threading.Lock = Lock
-    threading.RLock = RLock
-    threading.Event = Event
-    threading.Semaphore = Semaphore
-    threading.BoundedSemaphore = BoundedSemaphore
-    threading.Condition = Condition
-    threading.Barrier = Barrier
-
-    # Patch queue module
-    queue.Queue = CQueue
-    queue.LifoQueue = CLifoQueue
-    queue.SimpleQueue = CSimpleQueue
-
-
-def _unpatch_primitives() -> None:
-    """Restore original stdlib classes."""
-    for key, val in _originals.items():
-        if key == "threading.Thread":
-            continue # Handled by class logic
-        mod_name, attr = key.rsplit(".", 1)
-        mod = threading if mod_name == "threading" else queue
-        setattr(mod, attr, val)
-
-
-def _auto_run_parallel(fn: Callable[[Any], Any], items: Iterable[Any], num_workers: int = 0) -> list[Any]:
-    """Helper to run a function in parallel over items."""
-    try:
-        native_mod = importlib.import_module("cthreading._threading")
-        return native_mod.auto_run_parallel(fn, items, num_workers=num_workers)
-    except Exception:
-        from cthreading.pool import parallel_map
-        return parallel_map(fn, items, num_workers=num_workers)
-
 
 # ---------------------------------------------------------------------------
-# 2. AST Rewriting Logic (From New auto_.py)
+# Tiny AST helpers
 # ---------------------------------------------------------------------------
-
 _POOL_VAR   = "__ct_pool__"
 _FUT_PREFIX = "__ct_fut_"
+
 
 def _names_read(node: ast.AST) -> set[str]:
     return {
         n.id for n in ast.walk(node)
         if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Load)
     }
+
 
 def _is_pure_call(node: ast.AST) -> bool:
     """True iff node is a Call with no assignments/yield/await inside."""
@@ -157,17 +113,25 @@ def _is_pure_call(node: ast.AST) -> bool:
         for c in ast.walk(node)
     )
 
+
 def _pool_attr(attr: str) -> ast.Attribute:
     return ast.Attribute(
         value=ast.Name(id=_POOL_VAR, ctx=ast.Load()),
         attr=attr, ctx=ast.Load(),
     )
 
+
 def _call(func: ast.expr, *args: ast.expr,
           kws: list[ast.keyword] | None = None) -> ast.Call:
     return ast.Call(func=func, args=list(args), keywords=kws or [])
 
+
+# ---------------------------------------------------------------------------
+# Transformer
+# ---------------------------------------------------------------------------
+
 class _Transformer(ast.NodeTransformer):
+
     def __init__(self) -> None:
         self._n = 0
 
@@ -176,26 +140,25 @@ class _Transformer(ast.NodeTransformer):
         return f"{_FUT_PREFIX}{self._n}"
 
     # ---- 1. comprehensions ------------------------------------------------
+
     def _map_comp(self, elt: ast.expr,
                   gen: ast.comprehension) -> ast.Call | None:
         if gen.ifs or not _is_pure_call(elt):
             return None
-        call: ast.Call = elt
-        
+        call: ast.Call = elt  # type: ignore[assignment]
         # Simple: [f(x) for x in items]
         if (isinstance(gen.target, ast.Name) and
                 len(call.args) == 1 and not call.keywords and
                 isinstance(call.args[0], ast.Name) and
                 call.args[0].id == gen.target.id):
             return _call(_pool_attr("map"), call.func, gen.iter)
-        
         # Starmap: [f(a,b) for a,b in items]
         if (isinstance(gen.target, ast.Tuple) and
                 not call.keywords and
                 len(call.args) == len(gen.target.elts) and
                 all(isinstance(a, ast.Name) and isinstance(t, ast.Name)
                     and a.id == t.id
-                    for a, t in zip(call.args, gen.target.elts, strict=False))):
+                    for a, t in zip(call.args, gen.target.elts, strict=True))):
             return _call(_pool_attr("starmap"), call.func, gen.iter)
         return None
 
@@ -216,6 +179,7 @@ class _Transformer(ast.NodeTransformer):
         return node
 
     # ---- 2 & 3. for-range loops ------------------------------------------
+
     def visit_For(self, node: ast.For) -> ast.AST:
         self.generic_visit(node)
         if node.orelse:
@@ -236,7 +200,7 @@ class _Transformer(ast.NodeTransformer):
                 isinstance(s.op, ast.Add) and
                 isinstance(s.target, ast.Name) and
                 _is_pure_call(s.value)):
-            c: ast.Call = s.value
+            c: ast.Call = s.value  # type: ignore[assignment]
             if (len(c.args) == 1 and not c.keywords and
                     isinstance(c.args[0], ast.Name) and
                     c.args[0].id == loop_var and
@@ -256,7 +220,7 @@ class _Transformer(ast.NodeTransformer):
                 isinstance(s.targets[0].slice, ast.Name) and
                 s.targets[0].slice.id == loop_var and
                 _is_pure_call(s.value)):
-            c: ast.Call = s.value
+            c = s.value  # type: ignore[assignment]
             if (len(c.args) == 1 and not c.keywords and
                     isinstance(c.args[0], ast.Name) and
                     c.args[0].id == loop_var):
@@ -269,9 +233,11 @@ class _Transformer(ast.NodeTransformer):
                     lineno=node.lineno, col_offset=node.col_offset,
                 )
                 return ast.fix_missing_locations(repl)
+
         return node
 
     # ---- 4. independent call fusion --------------------------------------
+
     def _fuse(self, stmts: list[ast.stmt]) -> list[ast.stmt]:
         out: list[ast.stmt] = []
         i = 0
@@ -286,7 +252,7 @@ class _Transformer(ast.NodeTransformer):
                         isinstance(s.targets[0], ast.Name) and
                         _is_pure_call(s.value)):
                     break
-                c: ast.Call = s.value
+                c: ast.Call = s.value  # type: ignore[assignment]
                 if _names_read(c) & written:
                     break
                 tgt = s.targets[0].id
@@ -301,7 +267,7 @@ class _Transformer(ast.NodeTransformer):
 
             # submit phase
             futs: list[str] = []
-            for _tgt, c, orig in batch:
+            for tgt, c, orig in batch:
                 fn = self._fut()
                 futs.append(fn)
                 sub = ast.Assign(
@@ -331,21 +297,35 @@ class _Transformer(ast.NodeTransformer):
             i = j
         return out
 
+    # ---- visit_FunctionDef: apply all transforms + fuse ------------------
+
     def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.AST:
         # Skip generators
         if any(isinstance(n, (ast.Yield, ast.YieldFrom))
                for n in ast.walk(node)):
             return node
-        node = self.generic_visit(node)
+        # First, recurse into nested function bodies
+        node = self.generic_visit(node)  # type: ignore[assignment]
+        # Then fuse any independent sequential calls at this level
         node.body = self._fuse(node.body)
         return node
 
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> ast.AST:
         return node   # leave async alone
 
+
+# ---------------------------------------------------------------------------
+# Source-level rewriter
+# ---------------------------------------------------------------------------
+
 _rewritten_ids: set[int] = set()
 
-def _rewrite(fn: Callable[..., Any]) -> Callable[..., Any]:
+
+def _rewrite(fn: Callable) -> Callable:
+    """
+    Parse fn's source, run the transformer, recompile, and return a new
+    callable with the same globals.  Returns fn unchanged on any failure.
+    """
     if id(fn) in _rewritten_ids:
         return fn
     if not inspect.isfunction(fn):
@@ -357,7 +337,7 @@ def _rewrite(fn: Callable[..., Any]) -> Callable[..., Any]:
     except Exception:
         return fn
 
-    # Strip decorators
+    # Strip decorators so exec doesn't re-apply them
     for node in ast.walk(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             node.decorator_list = []
@@ -385,7 +365,12 @@ def _rewrite(fn: Callable[..., Any]) -> Callable[..., Any]:
     _rewritten_ids.add(id(new_fn))
     return new_fn
 
-def _rewrite_callees(fn: Callable[..., Any], depth: int = 0, max_depth: int = 8) -> None:
+
+def _rewrite_callees(fn: Callable, depth: int = 0, max_depth: int = 8) -> None:
+    """
+    Transitively rewrite every Python function in fn's module that hasn't
+    been rewritten yet.
+    """
     if depth >= max_depth:
         return
     mod_file = getattr(inspect.getmodule(fn), "__file__", None)
@@ -401,20 +386,22 @@ def _rewrite_callees(fn: Callable[..., Any], depth: int = 0, max_depth: int = 8)
                 globs[name] = new_obj
                 _rewrite_callees(new_obj, depth + 1, max_depth)
 
+
 # ---------------------------------------------------------------------------
-# Public API
+# Public proxy
 # ---------------------------------------------------------------------------
 
 class _AutoThreaded:
     """
-    Consolidated decorator and patch manager.
-    
-    As a decorator:
+    Single entry-point decorator / runner for automatic parallelism.
+
         @auto_threaded
         def main(): ...
-    
-    As a patcher:
-        auto_threaded.patch()
+
+        auto_threaded.run(main)       # wrap-and-call without modifying source
+        auto_threaded.patch()         # optional: route stdlib Thread → pool
+        auto_threaded.unpatch()
+        auto_threaded.is_patched()
     """
 
     def __init__(self) -> None:
@@ -423,70 +410,40 @@ class _AutoThreaded:
 
     def __call__(self, fn: F) -> F:
         """Rewrite fn and all callees in the same module."""
-        new_fn: F = _rewrite(fn)
+        new_fn = _rewrite(fn)
         _rewrite_callees(new_fn)
-        return new_fn
+        return new_fn  # type: ignore[return-value]
 
     def run(self, fn: Callable[..., Any], *args: Any, **kwargs: Any) -> Any:
         """Rewrite and immediately call fn."""
         return self(fn)(*args, **kwargs)
 
-    @staticmethod
-    def run_parallel(fn: Callable[[Any], Any], items: Iterable[Any], num_workers: int = 0) -> list[Any]:
-        """Manually execute *fn* over *items* using cthreading's native pool."""
-        return _auto_run_parallel(fn, items, num_workers=num_workers)
-
-    # ---- Global Patching (Thread + Primitives) ---------------------------
+    # ---- optional stdlib patch -------------------------------------------
 
     def patch(self) -> None:
-        """
-        Apply global patches to stdlib:
-        1. threading.Lock/Event/etc -> cthreading native equivalents.
-        2. threading.Thread -> routed to cthreading Pool.
-        """
+        """Route ``threading.Thread`` starts through the cthreading pool."""
         if self._patched:
             return
-
-        # 1. Patch Primitives (Lock, Queue, etc) - From old auto.py
-        _patch_primitives()
-
-        # 2. Patch Threading.Thread - From new auto_.py
         import threading as _t
         self._orig_thread = _t.Thread
         pool = _get_pool()
 
         class _PooledThread(_t.Thread):
-            def start(self) -> None:
-                pool.submit(self.run)
+            def start(self_t) -> None:   # noqa: N805
+                pool.submit(self_t.run)
 
-        _t.Thread = _PooledThread
-        
-        # Mark as patched
-        global _patched
+        _t.Thread = _PooledThread  # type: ignore[misc]
         self._patched = True
-        _patched = True
 
     def unpatch(self) -> None:
-        """Remove monkey-patches and restore original stdlib classes."""
         if not self._patched:
             return
-
-        # 1. Unpatch Primitives
-        _unpatch_primitives()
-
-        # 2. Unpatch Threading.Thread
         import threading as _t
-        if self._orig_thread:
-            _t.Thread = self._orig_thread
-
-        global _patched
+        _t.Thread = self._orig_thread  # type: ignore[misc]
         self._patched = False
-        _patched = False
-        _originals.clear()
 
     def is_patched(self) -> bool:
         return self._patched
 
-auto_threaded = _AutoThreaded()
 
-__all__ = ["auto_threaded"]
+auto_threaded = _AutoThreaded()

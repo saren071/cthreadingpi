@@ -31,13 +31,23 @@ import random
 import sys
 import threading
 import time
-from typing import Callable
+from typing import TYPE_CHECKING
 
 from bench_format import (
-    CPUS, WORKERS, Metrics,
-    print_header, section, record, print_suite_summary, export_json,
+    CPUS,
+    WORKERS,
+    Metrics,
+    export_json,
+    print_header,
+    print_suite_summary,
+    record,
+    section,
 )
+
 from cthreading import parallel_starmap
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 # ===================================================================
 # CONFIG
@@ -134,7 +144,7 @@ def workload_nbody(seed: int, chunk_id: int) -> float:
     G = 1.0
 
     # Initialise particles: [x, y, vx, vy, mass]
-    particles = []
+    particles: list[list[float]] = []
     for _ in range(n):
         particles.append([
             rng.uniform(-10, 10),   # x
@@ -276,7 +286,7 @@ def bench_pmap(
 ) -> tuple[float, list[float]]:
     def coarse_worker(tid: int, n_items: int, n_workers: int) -> list[tuple[int, float]]:
         """Each task handles its share of chunks — same granularity as stdlib."""
-        results = []
+        results: list[tuple[int, float]] = []
         for i in range(tid, n_items, n_workers):
             cs = workload_fn(BASE_SEED, i)
             results.append((i, cs))
@@ -325,7 +335,7 @@ def main() -> None:
 
         section(f"SEQUENTIAL BASELINE: {wname}")
         print("    Running …", end=" ", flush=True)
-        seq_time, seq_cs = bench_sequential(wfn, num_items)
+        seq_time, _seq_cs = bench_sequential(wfn, num_items)
         print(f"{seq_time:.4f}s")
 
         print("    [1/2] stdlib threading …", end=" ", flush=True)
